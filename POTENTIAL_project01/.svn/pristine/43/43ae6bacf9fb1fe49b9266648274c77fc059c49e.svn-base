@@ -1,0 +1,178 @@
+package com.potential.bookapply.control;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import com.potential.bookapply.dao.BookApplyDao;
+import com.potential.bookapply.domain.BookApplyVO;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+
+/**
+ * @author sist
+ *
+ */
+public class BookApplyController implements Initializable{
+ 
+	BookApplyDao dao = new BookApplyDao();
+	Alert alert = new Alert(AlertType.INFORMATION);
+	
+	/**현재리스트*/
+	List<BookApplyVO> nowList = new ArrayList<>();
+	
+	/**텍스트필드*/
+	@FXML private TextField inputTitle;
+	@FXML private TextField inputAuthor;
+	@FXML private TextField inputPublisher;
+	@FXML private TextField inputPubYear;
+	@FXML private TextField inputSearch;
+	@FXML private TextArea inputComment;
+	
+	/**버튼*/
+	@FXML private Button apply;
+	@FXML private Button search;
+	
+	/**테이블*/
+	@FXML private TableView<BookApplyList> table = new TableView(); 
+	@FXML private ObservableList<BookApplyList> observableList = FXCollections.observableArrayList();
+	@FXML private TableColumn<BookApplyList, String> titleColumn;
+	@FXML private TableColumn<BookApplyList, String> authorColumn;
+	@FXML private TableColumn<BookApplyList, String> publisherColumn;
+	@FXML private TableColumn<BookApplyList, String> pubYearColumn;
+	@FXML private TableColumn<BookApplyList, String> commentColumn;
+	@FXML private TableColumn<BookApplyList, String> statusColumn;
+	
+	
+	//신청 버튼 누르면 책 신청하고 파일에 저장
+	public void applyBook(){
+		
+		//제목 텍스트필드 비어 있으면 알림창
+		if (inputTitle.getText() == null || inputTitle.getText().trim().isEmpty()) {
+			alert.setTitle("도서신청");
+			alert.setHeaderText(null);
+			alert.setContentText("제목을 입력해 주세요.");
+			alert.show();
+			inputTitle.isFocused();
+		}else{
+			//각 필드에 입력된 값들을 받아 vo로 저장
+			BookApplyVO vo = new BookApplyVO(inputTitle.getText(), inputAuthor.getText(), 
+					inputPublisher.getText(), inputPubYear.getText(), 
+					inputComment.getText(), "대기");
+			alert.setTitle("도서신청");
+			alert.setHeaderText(null);
+			
+			//새 vo를 list에 추가
+			int flag = dao.do_save(vo);
+			
+			//신청상태 알려주기
+			if(flag==1){
+				alert.setContentText("신청하였습니다.");
+				//테이블에 업데이트
+				table.getItems().add(new BookApplyList(new SimpleStringProperty(inputTitle.getText())
+						,new SimpleStringProperty(inputAuthor.getText())
+						,new SimpleStringProperty(inputPublisher.getText())
+						,new SimpleStringProperty(inputPubYear.getText())
+						,new SimpleStringProperty(inputComment.getText())
+						,new SimpleStringProperty("대기")));
+			}else if(flag==0){
+				alert.setContentText("이미 신청된 도서입니다.");
+			}else{
+				alert.setContentText("구입이 거부된 도서입니다.");
+			}
+			alert.show();
+			
+			//파일 저장
+			dao.saveFile();
+			
+			//각 텍스트필드 비우기
+			inputTitle.setText("");
+			inputAuthor.setText("");
+			inputPublisher.setText("");
+			inputPubYear.setText("");
+			inputComment.setText("");
+		}
+		
+		
+	}
+	
+	//검색 버튼 누르면 책 제목으로 검색
+	public void searchBook(){
+		 
+		String keyword = inputSearch.getText();
+		
+		//입력 받은 키워드로 검색한 결과를 리스트로 만들기 
+		List<BookApplyVO> searchResult = dao.do_searchByTitle(keyword);
+		
+		//검색 결과가 없으면
+		if(searchResult.isEmpty()){
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("도서신청");
+			alert.setHeaderText(null);
+			alert.setContentText("검색결과가 없습니다.");
+			alert.show();
+		 }else{//검색결과가 있으면 현재 화면의 리스트를 지우고 검색결과 리스트로 채우기
+			clearTable(nowList);
+			fillTable(searchResult);
+			
+			//현재 테이블에 뜬 리스트를 '현재리스트'로 저장하기
+			nowList = searchResult;
+		 }
+	}
+	
+
+	
+	//테이블 비우기
+	public void clearTable(List<BookApplyVO> list){
+		for(int i=list.size()-1; i>=0; i--){
+			table.getItems().remove(i);
+		}
+	}	
+	
+	//테이블에 데이터 채우기
+	public void fillTable(List<BookApplyVO> list){
+		for(int i=0; i<list.size(); i++){
+			observableList.add(new BookApplyList(new SimpleStringProperty(list.get(i).getTitle())
+								,new SimpleStringProperty(list.get(i).getAuthor())
+								,new SimpleStringProperty(list.get(i).getPublisher())
+								,new SimpleStringProperty(list.get(i).getPubYear())
+								,new SimpleStringProperty(list.get(i).getComment())
+								,new SimpleStringProperty(list.get(i).getStatus())));
+		}
+			table.setItems(observableList);
+	}
+	
+	//테이블 초기화
+	public void setCell(){
+		titleColumn.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
+		authorColumn.setCellValueFactory(cellData -> cellData.getValue().authorProperty());
+		publisherColumn.setCellValueFactory(cellData -> cellData.getValue().publisherProperty());
+		pubYearColumn.setCellValueFactory(cellData -> cellData.getValue().pubYearProperty());
+		commentColumn.setCellValueFactory(cellData -> cellData.getValue().commentProperty());
+		statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());		
+	}
+	
+	public void initialize(URL location, ResourceBundle resources){
+		setCell();
+		fillTable(dao.getList());
+		nowList=dao.getList();
+	}
+	
+	
+}

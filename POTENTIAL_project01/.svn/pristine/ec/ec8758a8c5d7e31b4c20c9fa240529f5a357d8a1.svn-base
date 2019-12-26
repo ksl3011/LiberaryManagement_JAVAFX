@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.RentListControl">
+   <children>
+      <ComboBox fx:id="rent_comboBox1" layoutX="385.0" layoutY="5.0" prefHeight="23.0" prefWidth="84.0" promptText="선택" />
+      <TextField fx:id="rent_textInput" layoutX="477.0" layoutY="5.0" />
+      <Button fx:id="rent_searchButton" layoutX="623.0" layoutY="5.0" mnemonicParsing="false" text="검색" />
+      <Label alignment="CENTER" ellipsisString="" layoutX="14.0" layoutY="7.0" prefHeight="19.0" prefWidth="175.0" text="ADMIN - 대출현황">
+         <font>
+            <Font name="Verdana" size="15.0" />
+         </font>
+      </Label>
+      <TableView fx:id="rent_tableView" layoutX="12.0" layoutY="55.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0" prefWidth="650.0">
+        <columns>
+          <TableColumn fx:id="rent_tableColumn_ID" maxWidth="500.0" prefWidth="99.0" text="ID" />
+          <TableColumn fx:id="rent_tableColumn_name" prefWidth="175.0" text="책 이름" />
+            <TableColumn fx:id="rent_tableColumn_author" prefWidth="98.0" text="저자" />
+            <TableColumn fx:id="rent_tableColumn_date" prefWidth="84.0" text="빌린날짜" />
+            <TableColumn fx:id="rent_tableColumn_over" prefWidth="49.0" text="연체" />
+            <TableColumn fx:id="rent_tableColumn_library" prefWidth="91.0" text="소장도서관" />
+            <TableColumn fx:id="rent_tableColumn_possible" minWidth="0.0" prefWidth="53.0" text="연장" />
+        </columns>
+      </TableView>
+      <Button fx:id="rent_AllList" layoutX="292.0" layoutY="5.0" mnemonicParsing="false" text="전체" />
+      <Button fx:id="rent_OverList" layoutX="332.0" layoutY="5.0" mnemonicParsing="false" text="연체" />
+      <TextField fx:id="rent_alert" disable="true" focusTraversable="false" layoutX="12.0" layoutY="35.0" prefHeight="20.0" prefWidth="650.0">
+         <font>
+            <Font name="Verdana Bold" size="10.0" />
+         </font>
+      </TextField>
+      <Button fx:id="rent_renew" layoutX="210.0" layoutY="5.0" mnemonicParsing="false" text="새로고침" textAlignment="CENTER">
+         <font>
+            <Font name="Verdana" size="12.0" />
+         </font>
+      </Button>
+      
+   </children>
+</AnchorPane>

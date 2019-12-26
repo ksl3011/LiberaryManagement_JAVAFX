@@ -1,0 +1,74 @@
+package com.potential.mypagerewrite.controll;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import com.potential.member.dao.MemberDao;
+import com.potential.member.domain.MemberVO;
+import com.potential.mypagerewrite.dao.MypageRewriteDao;
+
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+
+public class MypageRewriteControll implements Initializable {
+	@FXML TextField mypageName;
+	@FXML PasswordField mypagePw;
+	@FXML PasswordField mypagePwcheck;
+	@FXML TextField mypageAddress;
+	@FXML TextField mypageTel;
+	@FXML TextField mypageid;
+	@FXML Label message;
+	@FXML Button rewrt;
+	
+	private List<MemberVO> mbList = new ArrayList<>();
+	private final String rewrite = "E:/JAVA/workspace_java/POTENTIAL_project01/data/java04/memberlist.csv";
+
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		
+		rewrt.setOnAction(e->handlerREAction(e));
+
+	}
+	
+	public void handlerREAction(ActionEvent e){
+		String userId = mypageid.getText();
+		String userPw = mypagePw.getText();
+		String userPwcherck = mypagePwcheck.getText();
+		String userName = mypageName.getText();
+		String userAddress = mypageAddress.getText();
+		String userTel = mypageTel.getText();
+		
+		MypageRewriteDao daoo= new MypageRewriteDao();
+		MemberVO member = new MemberVO(userId,userPw,userName,userAddress,userTel);
+		
+		
+		if(userPw.equals(userPwcherck)){
+			mbList = daoo.readFile(rewrite);	
+		
+	
+			for(int i=this.mbList.size()-1;i>=0;i--){
+				MemberVO orgVO = mbList.get(i);
+				if(orgVO.getId().equals(member.getId())){
+					mbList.remove(i);
+					break;				
+				}
+			}	
+			
+			mbList.add(member);
+			daoo.saveFile(mbList);
+			Platform.exit();
+		}else{
+			message.setText("PW 또는 PW*을 확인해주세요.");
+		}
+	    
+	}
+
+}

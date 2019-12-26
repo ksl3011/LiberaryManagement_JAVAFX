@@ -1,0 +1,75 @@
+/**
+ * @Class Name : BookApplyDao.java
+ * @Description : 
+ * @Modification Information
+ * @
+ * @  수정일      수정자              수정내용
+ * @ ---------   ---------   -------------------------------
+ * @ 2019-05-23           최초생성
+ *
+ * @author 개발프레임웍크 실행환경 HR.POTENTIAL 개발팀
+ * @since 2019-05-23 
+ * @version 1.0
+ * @see
+ *
+ *  Copyright (C) by HR.POTENTIAL All right reserved.
+ */
+package com.potential.bookApply.dao;
+
+import java.util.List;
+
+import com.hr.cmn.DTO;
+import com.hr.cmn.WorkDiv;
+
+/**
+ * @author sist
+ *
+ */
+public class BookApplyDao implements WorkDiv {
+
+	/* (non-Javadoc)
+	 * @see com.hr.cmn.WorkDiv#do_save(com.hr.cmn.DTO)
+	 */
+	@Override
+	public int do_save(DTO dto) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.hr.cmn.WorkDiv#do_delete(com.hr.cmn.DTO)
+	 */
+	@Override
+	public int do_delete(DTO dto) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.hr.cmn.WorkDiv#do_update(com.hr.cmn.DTO)
+	 */
+	@Override
+	public int do_update(DTO dto) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.hr.cmn.WorkDiv#do_selectOne(com.hr.cmn.DTO)
+	 */
+	@Override
+	public DTO do_selectOne(DTO dto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.hr.cmn.WorkDiv#do_retrieve(com.hr.cmn.DTO)
+	 */
+	@Override
+	public List<DTO> do_retrieve(DTO dto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

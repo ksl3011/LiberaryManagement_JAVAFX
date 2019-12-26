@@ -1,0 +1,9 @@
+package com.potential.rental.control;
+
+/**
+ * User전용 마이페이지 대여목록 컨트롤러 클래스
+ * */
+public class MypageRentalControl {
+
+	
+}

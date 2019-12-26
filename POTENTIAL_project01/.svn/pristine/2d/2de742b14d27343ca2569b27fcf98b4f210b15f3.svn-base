@@ -1,0 +1,337 @@
+package com.potential.rental.dao;
+
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import com.hr.cmn.DTO;
+import com.hr.cmn.WorkDiv;
+import com.potential.rental.domain.RentVO;
+
+/**
+ * RentalDAO
+ * 
+ * @Constructor:	FileData_DownLoad()
+ * @Method1  FileData_DownLoad()
+ * @Method2  saveToFile()
+ * @Method3  addToList(RentVO rentVo)
+ * @Method4  is_exist(int select, String name)
+ * @Method5  deleteToList(String name, String author)
+ * @Method6  return_VO(String name, String author)
+ * @Method7  return_LendingDay(String name, String author)
+ * @Method8  return_Select_all_List(String ID)
+ * @Method9  return_All_List()
+ * @Method10 lending_Extension(String ID, String name, String author)
+ * @Method11 remainder(String ID, String name, String author)
+ * @Method12 overdue_BookList()
+ * 
+ * */
+public class RentalDAO implements WorkDiv {
+	List<RentVO> list = new ArrayList<>();
+	String TEMP_FILE_PATH = "C:\\Users\\sist\\Documents\\RentBookList.txt";
+	String FILE_PATH = "C:\\Users\\sist\\Desktop\\RentBookList.txt";	
+	//String FILE_PATH = "//211.238.142.124//hr_data//java04//RentBookList.txt";	//네트워크
+	File file = new File(FILE_PATH);
+	/**대출기간*/
+	final int LENDING_DAY = 14;
+
+	/**Constructor : FileData Download*/
+	public RentalDAO(){
+		FileData_DownLoad();
+	}
+	
+	/**파일데이터 받아오기*/
+	public void FileData_DownLoad(){
+		List<RentVO> listTmp = new ArrayList<>();
+		if(!file.exists()){
+			return;
+		}
+		String tmp = "";
+		try( BufferedReader br = new BufferedReader(new FileReader(FILE_PATH)) ) {	
+			while( (tmp = br.readLine()) != null ){
+				String[] tmpVo = tmp.split("&&&");
+				RentVO rentvo = new RentVO(tmpVo[0],tmpVo[1],tmpVo[2],tmpVo[3],tmpVo[4],Integer.parseInt(tmpVo[5]));
+				listTmp.add(rentvo);
+			}			
+			list = listTmp;
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	/**BookList to File
+	 * */
+	public void saveToFile() {
+		FileWriter fw =null;
+		File tempfile = new File(TEMP_FILE_PATH);
+		//File tempfile = new File(FILE_PATH);	//네트워크
+		try{
+			tempfile.createNewFile();				
+			fw = new FileWriter(tempfile);
+			for(int i=0; i<list.size() ; i++)
+				fw.write(list.get(i).toString() + "\r\n");
+		}catch(IOException e){
+				e.printStackTrace();
+		}finally{
+			try {fw.close();} catch (IOException e) {e.printStackTrace();}
+		}
+		if(tempfile.renameTo(file) == false){
+			file.delete();
+			tempfile.renameTo(file);
+		}
+	}
+	
+	/**RentVO parameter
+	 * String bookName, String author, String publicationDate, String librarySpot, String rentalDate*/
+	public boolean addToList(RentVO rentVo) {
+		if( this.is_exist(0,rentVo.getBookName()) == -1 ){
+			list.add(rentVo);
+			return true;
+		}else{
+			if( this.is_exist(1, rentVo.getAuthor()) == -1){
+				list.add(rentVo);
+				return true;
+			}
+		}
+			return false;
+	} 
+
+	/**대여상태인 책 중에서 찾고자 하는 책의 유무를 리턴
+	 * @param : int (0 or 1), String s
+	 * 0-> s에 책의 이름<p>1-> 저자 입력<p>2-> ID입력<p>3->도서관 입력
+	 * <p>존재 = index_number
+	 * <p>없음 = -1
+	 * <p>같은 이름을 가진 책인 경우 제일 처음 검색된 하나의 i값만 리턴*/
+	public int is_exist(int select, String name) {
+		if(select == 0){
+			for(int i=0 ; i<list.size() ; i++){
+				if(list.get(i).getBookName().equals(name.trim())){
+					return i;
+				}
+			}
+		}else if(select == 1){
+			for(int i=0 ; i<list.size() ; i++){
+				if(list.get(i).getAuthor().equals(name.trim())){
+					return i;
+				}
+			}
+		}else if(select == 2){
+			for(int i=0 ; i<list.size() ; i++){
+				if(list.get(i).getID().equals(name.trim())){
+					return i;
+				}
+			}
+		}else if(select == 3){
+			for(int i=0 ; i<list.size() ; i++){
+				if(list.get(i).getLibrarySpot().equals(name.trim())){
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+	
+	/**대여한 책 리스트에서 책 제거*/
+	public boolean deleteToList(String name, String author) {
+		int i=0;
+		if(	((i=( this.is_exist(1, author) ))>= 0)
+			&& (this.is_exist(0, name) >= 0) ){
+			list.remove(i);
+			System.out.println("성공");
+			return true;
+		}System.out.println("실패");
+		return false;
+	}
+	
+	/**대여중인 책 리스트에서 찾는 책의 VO를 반환*/
+	public RentVO return_VO(String name, String author) {
+		int i=0;
+		if(	((i=( this.is_exist(1, author) ))>= 0)
+			&& (this.is_exist(0, name) >= 0) ){
+			return list.get(i);
+		}
+		return null;
+	}
+	
+	/**대여일을 Calendar형으로 리턴*/
+	public Calendar return_LendingDay(RentVO inVo) {
+		if( inVo == null) return null;
+		Calendar c = Calendar.getInstance();
+		String[] date = inVo.getRentalDate().split("/");
+		c.set(Integer.parseInt(date[0])+2000, Integer.parseInt(date[1]), Integer.parseInt(date[2]));
+		return c;
+	}
+	
+	/**List에 있는 책 중 파라미터를 가진 전체목록을 리턴
+	 * @param int select, String name, 모집합 RentVO의 list
+	 * @select->0 ID
+	 * @select->1 책제목
+	 * @select->2 저자
+	 * @select->3 도서관
+	 * */
+	public List<RentVO> return_Select_all_List(int select, String name, List<RentVO> list) {
+		List<RentVO> tmplist = new ArrayList<>();
+		switch(select){
+			case 0:
+				if( this.is_exist(2, name) == -1){
+					return null;
+				}
+				for(int i=0 ; i<list.size() ; i++){
+					if(list.get(i).getID().equals(name.trim())){
+						tmplist.add(list.get(i));
+					}
+				}
+				break;
+			case 1:
+				if( this.is_exist(0, name) == -1){
+					return null;
+				}
+				for(int i=0 ; i<list.size() ; i++){
+					if(list.get(i).getBookName().equals(name.trim())){
+						tmplist.add(list.get(i));
+					}
+				}
+				break;
+			case 2:
+				if( this.is_exist(1, name) == -1){
+					return null;
+				}
+				for(int i=0 ; i<list.size() ; i++){
+					if(list.get(i).getAuthor().equals(name.trim())){
+						tmplist.add(list.get(i));
+					}
+				}
+				break;
+			case 3:
+				if( this.is_exist(3, name) == -1){
+					return null;
+				}
+				for(int i=0 ; i<list.size() ; i++){
+					if(list.get(i).getLibrarySpot().equals(name.trim())){
+						tmplist.add(list.get(i));
+					}
+				}
+				break;
+			default:
+				return null;
+		}
+		return tmplist;
+	}
+	
+	/**대여중인 책 목록전체를 리턴*/
+	public List<RentVO> return_All_List() {
+		return list;
+	}
+	
+	/**대출연장*/
+	public boolean lending_Extension(String ID, String name, String author) {
+		List<RentVO> tmp = return_Select_all_List(0, ID,list);
+		if(tmp != null){
+			for(int i=0 ; i<tmp.size() ; i++){
+				if( tmp.get(i).getBookName().equals(name) && tmp.get(i).getAuthor().equals(author) ){
+					RentVO tmpVO = tmp.get(i);
+					//연장가능유무
+					if(tmpVO.getPossible()==1) return false;
+					//날짜변경
+					Calendar c = Calendar.getInstance();
+					String[] date = tmpVO.getRentalDate().split("/");
+					c.set(Integer.parseInt(date[0])+2000, Integer.parseInt(date[1]), Integer.parseInt(date[2]));
+					//반납날에 한번 더 책을 빌린것과 같은 효과
+					c.set(Calendar.DAY_OF_MONTH, LENDING_DAY);
+					String newDay = String.valueOf((c.get(Calendar.YEAR)-2000)) + "/"
+									+ String.valueOf(c.get(Calendar.MONTH))		+ "/"
+									+ String.valueOf(c.get(Calendar.DAY_OF_MONTH));
+					tmpVO.setRentalDate(newDay);
+					tmpVO.setPossible(1);
+					//기존데이터 지우고 새 데이터 추가
+					deleteToList(tmpVO.getBookName(), tmpVO.getAuthor());
+					addToList(tmpVO);
+					saveToFile();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**반납일까지 남은일수계산
+	 * @return 100일경우 계산실패*/
+	public int remainder(String ID, String name, String author) {
+		List<RentVO> tmp = return_Select_all_List(0, ID,list);
+		if(tmp != null){
+			for(int i=0 ; i<tmp.size() ; i++){
+				if( tmp.get(i).getBookName().equals(name) && tmp.get(i).getAuthor().equals(author) ){
+					RentVO tmpVO = tmp.get(i);
+					//유저의 책 반납날짜
+					Calendar c_user = Calendar.getInstance();					
+					String[] date = tmpVO.getRentalDate().split("/");
+					c_user.set(Integer.parseInt(date[0])+2000, Integer.parseInt(date[1])-1, Integer.parseInt(date[2]));
+					c_user.set(Calendar.DAY_OF_MONTH, c_user.get(Calendar.DAY_OF_MONTH) +LENDING_DAY);
+					//오늘날짜
+					Calendar c_today = Calendar.getInstance();
+					//계산
+					double result =  (c_user.getTimeInMillis() - c_today.getTimeInMillis());
+					result = result / 1000 /60 /60 /24 ;
+					return (int)result;
+				}
+			}
+		}
+		return 100;
+	}
+	
+	/**연체중인 책 리스트를 리턴 */
+	public List<RentVO> return_Overdue_BookList(){
+		List<RentVO> list = return_All_List();
+		List<RentVO> tmp = new ArrayList<>();	
+		Calendar c = Calendar.getInstance();
+		
+		for(int i=0 ; i<list.size() ; i++){
+			double result = return_LendingDay(list.get(i)).getTimeInMillis() - c.getTimeInMillis();
+			result = (int)(result / 1000 /60 /60 /24);
+			System.out.println(list.get(i).getID() + " 결과:" + result);
+			if( result <= 0){
+				tmp.add(list.get(i));
+			}
+		}
+		return tmp;
+	}
+
+	@Override
+	public int do_save(DTO dto) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int do_delete(DTO dto) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int do_update(DTO dto) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public DTO do_selectOne(DTO dto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<DTO> do_retrieve(DTO dto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+}

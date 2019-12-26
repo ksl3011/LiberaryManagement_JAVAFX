@@ -1,0 +1,8 @@
+package com.potential.booksearch.domain;
+
+import com.hr.cmn.DTO;
+
+public class BookSearchVO extends DTO {
+	
+
+}

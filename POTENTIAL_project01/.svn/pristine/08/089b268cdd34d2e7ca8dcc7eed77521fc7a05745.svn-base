@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <AnchorPane prefHeight="504.0" prefWidth="351.0">
+         <children>
+            <Label layoutX="37.0" layoutY="55.0" prefHeight="41.0" prefWidth="67.0" text="제목" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label layoutX="37.0" layoutY="105.0" prefHeight="41.0" prefWidth="67.0" text="저자" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label layoutX="37.0" layoutY="160.0" prefHeight="41.0" prefWidth="67.0" text="출판사" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label layoutX="37.0" layoutY="209.0" prefHeight="41.0" prefWidth="67.0" text="발행연도" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label layoutX="37.0" layoutY="254.0" prefHeight="41.0" prefWidth="67.0" text="등록번호" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label layoutX="37.0" layoutY="300.0" prefHeight="41.0" prefWidth="67.0" text="도서관" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label layoutX="37.0" layoutY="358.0" prefHeight="41.0" prefWidth="67.0" text="정렬조건" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <TextField layoutX="104.0" layoutY="60.0" prefHeight="32.0" prefWidth="202.0" />
+            <TextField layoutX="104.0" layoutY="110.0" prefHeight="32.0" prefWidth="202.0" />
+            <TextField layoutX="104.0" layoutY="165.0" prefHeight="32.0" prefWidth="202.0" />
+            <TextField layoutX="104.0" layoutY="214.0" prefHeight="32.0" prefWidth="202.0" />
+            <TextField layoutX="104.0" layoutY="259.0" prefHeight="32.0" prefWidth="202.0" />
+            <TextField layoutX="104.0" layoutY="305.0" prefHeight="32.0" prefWidth="202.0" />
+            <TextField layoutX="104.0" layoutY="363.0" prefHeight="32.0" prefWidth="202.0" />
+            <Button layoutX="208.0" layoutY="422.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="98.0" text="검색">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Button>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
